@@ -26,17 +26,25 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 
+	// user
 	userRepo := repository.NewUserRepository(config.DB)
 	userUsecase := usecase.NewUserUsecase(userRepo)
 	deliveryHTTP.NewUserHandler(r, userUsecase)
 
+	// product
 	productRepo := repository.NewProductRepository(config.DB)
 	productUsecase := usecase.NewProductUsecase(productRepo)
 
+	// transaction
+	transactionRepo := repository.NewTransactionRepository(config.DB)
+	transactionUsecase := usecase.NewTransactionUsecase(transactionRepo)
+	
+	// middleware
 	protected := r.Group("/api")
 	protected.Use(middleware.AuthMiddleware())
-
+	// protected
 	deliveryHTTP.NewProductHandler(protected, productUsecase)
+	deliveryHTTP.NewTransactionHandler(protected, transactionUsecase)
 
 	r.GET("/api/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "pong!"})
