@@ -44,7 +44,7 @@ func (h *ProductHandler) Create(c *gin.Context) {
 func (h *ProductHandler) GetAll(c *gin.Context) {
 	products, err := h.usecase.GetAllProducts()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "gagal mengambil data produk"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "gagal mengambil data produk" + err.Error()})
 		return
 	}
 

@@ -23,7 +23,7 @@ func (r* ProductRepository) Create(product *models.Product) error {
 // mengambil semua produk dari database
 func (r *ProductRepository) GetAll() ([]models.Product, error) {
 	var products []models.Product
-	err := r.db.Find(products).Error
+	err := r.db.Find(&products).Error
 	return products, err
 }
 
