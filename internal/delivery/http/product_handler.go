@@ -12,10 +12,10 @@ type ProductHandler struct {
 	usecase *usecase.ProductUsecase
 }
 
-func NewProductHandler(r *gin.Engine, usecase *usecase.ProductUsecase) {
+func NewProductHandler(r *gin.RouterGroup, usecase *usecase.ProductUsecase) {
 	handler := &ProductHandler{usecase: usecase}
 
-	api := r.Group("/api/products")
+	api := r.Group("/api/products")	
 	{
 		api.POST("/", handler.Create)
 		api.GET("/", handler.GetAll)

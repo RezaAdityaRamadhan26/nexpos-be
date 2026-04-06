@@ -6,10 +6,10 @@ import (
 )
 
 type ProductUsecase struct {
-	repo repository.ProductRepository
+	repo *repository.ProductRepository
 }
 
-func NewProductUsecase (repo repository.ProductRepository) *ProductUsecase {
+func NewProductUsecase (repo *repository.ProductRepository) *ProductUsecase {
 	return &ProductUsecase{repo: repo}
 }
 

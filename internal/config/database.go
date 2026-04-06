@@ -1,4 +1,4 @@
-package	config 
+package config
 
 import (
 	"fmt"
@@ -36,9 +36,15 @@ func ConnectDB() {
 	DB = database
 	log.Println("terhubung ke database")
 
-	err = DB.AutoMigrate(&models.User{}, &models.Product{})
+	err = DB.AutoMigrate(
+		&models.User{},
+		&models.Product{},
+		&models.Transaction{},
+		&models.TransactionDetail{},
+	)
+
 	if err != nil {
 		log.Fatal("gagal melakukan migrasi database", err)
 	}
-	log.Println("table user dan product berhasil dibuat / di migrasi ke postgresql!")
+	log.Println("seluruh table berhasul dibuat / di migrasi ke database!")
 }
