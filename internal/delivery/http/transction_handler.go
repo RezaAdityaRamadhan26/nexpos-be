@@ -24,6 +24,11 @@ func NewTransactionHandler (r *gin.RouterGroup, usecase *usecase.TransactionUsec
 func (h *TransactionHandler) Checkout(c *gin.Context) {
 	var trx models.Transaction
 
+	if err := c.ShouldBindBodyWithJSON(&trx); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "format data salah" + err.Error()})
+		return
+	}
+
 	if err := h.usecase.Checkout(&trx); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "gagal transaksi" + err.Error()})
 		return

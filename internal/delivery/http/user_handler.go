@@ -8,8 +8,56 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type RegisterStoreRequest struct {
+	StoreName    string `json:"store_name" binding:"required"`
+	StoreAddress string `json:"store_address"`
+	OwnerName    string `json:"owner_name" binding:"required"`
+	OwnerEmail   string `json:"email" binding:"required,email"`
+	Password     string `json:"password" binding:"required,min=6"`
+}
+
+type VerifyOTPRequest struct {
+	Email   string `json:"email" binding:"required,email"`
+	OTPCode string `json:"otp_code" binding:"required"`
+}
+
 type UserHandler struct {
 	usecase *usecase.UserUsecase
+}
+
+func (h *UserHandler) RegisterStore(c * gin.Context) {
+	var req usecase.RegisterStoreRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	
+	if err := h.usecase.RegisterStore(req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Toko Berhasil Didaftarkan, silahkan cek email untuk kode verifikasi",
+	})
+}
+
+func (h *UserHandler) VerifyOTP(c *gin.Context) {
+	var req usecase.VerifyOTPRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.usecase.VerifyOTP(req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Verifikasi barhasil!, akun dan toko sekarang aktif",
+	})
 }
 
 func NewUserHandler (r *gin.Engine, usecase *usecase.UserUsecase) {
@@ -19,6 +67,8 @@ func NewUserHandler (r *gin.Engine, usecase *usecase.UserUsecase) {
 	{
 		api.POST("/register", handler.Register)
 		api.POST("/login", handler.Login)
+		api.POST("/register-store", handler.RegisterStore)
+		api.POST("/verify-otp", handler.VerifyOTP)
 	}
 }
 

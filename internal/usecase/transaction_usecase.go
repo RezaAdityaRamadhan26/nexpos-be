@@ -26,6 +26,7 @@ func (u *TransactionUsecase) Checkout(trx *models.Transaction) error {
 		subTotal := detail.Price * float64(detail.Quantity) 
 
 		trx.Details[i].SubTotal = subTotal
+		TotalAmount += subTotal
 	}
 
 	trx.TotalAmount = TotalAmount

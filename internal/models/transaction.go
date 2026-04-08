@@ -4,6 +4,7 @@ import "time"
 
 type Transaction struct {
 	ID            uint                `gorm:"primaryKey" json:"id"`
+	StoreID       uint                `gorm:"not null" json:"store_id"`
 	UserID        uint                `gorm:"not null" json:"user_id"` // id kasir
 	TotalAmount   float64             `gorm:"type:decimal(12,2);not null" json:"total_amount"`
 	PaymentMethod string              `gorm:"type:varchar(50)" json:"payment_method"` // contoh : tunai, qris, transfer
