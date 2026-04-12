@@ -10,6 +10,8 @@ type Transaction struct {
 	PaymentMethod string              `gorm:"type:varchar(50)" json:"payment_method"` // contoh : tunai, qris, transfer
 	Status        string              `gorm:"type:varchar(20);default:'pending'" json:"status"` // pending, paid, completed, cancelled
 	Details       []TransactionDetail `gorm:"foreignKey:TransactionID" json:"details"` // relasi ke tabel detail
+	User          User                `gorm:"foreignKey:UserID" json:"user"`
+	Store         Store               `gorm:"foreignKey:StoreID" json:"store"`
 	CreatedAt     time.Time           `json:"created_at"`
 	UpdatedAt     time.Time           `json:"updated_at"`
 }
@@ -23,4 +25,5 @@ type TransactionDetail struct {
 	SubTotal      float64   `gorm:"type:decimal(12,2);not null" json:"sub_total"` // quantity * price
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
-}
+	Product       Product   `gorm:"foreignKey:ProductID" json:"product"` // untuk struk atau history
+}	

@@ -8,7 +8,8 @@ type User struct {
 	Name string `gorm:"type:varchar(100);not null" json:"name"`
 	Email string `gorm:"type:varchar(100);unique;not null" json:"email"`
 	Password string `gorm:"not null" json:"-"` // json:"-" password ga ikut kekirim ke fe nextjs
-	Role string `gorm:"type:varchar(20);default:'kasir'" json:"role"`
+	Role string `gorm:"type:varchar(20);default:'kasir'" json:"role"`// untuk RBAC (Role based access control)
+	CanManageProducts bool  `gorm:"default:false" json:"can_manage_products"`
 	IsVerified    bool      `gorm:"default:false" json:"is_verified"`
 	OTPCode       string    `gorm:"type:varchar(6)" json:"-"` // Jangan kirim OTP ke JSON Frontend
 	OTPExpiration time.Time `json:"-"`

@@ -36,13 +36,6 @@ func ConnectDB() {
 	DB = database
 	log.Println("terhubung ke database")
 
-	err = DB.Migrator().DropTable(
-		&models.TransactionDetail{},
-		&models.Transaction{},
-		&models.Product{},
-		&models.User{},
-		&models.Store{},
-	)
 	err = DB.AutoMigrate(
 		&models.Store{},
 		&models.User{},
