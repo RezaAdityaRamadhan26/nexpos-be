@@ -16,6 +16,7 @@ func main() {
 	config.ConnectDB()
 
 	r := gin.Default()
+	r.Static("/uploads", "./uploads")
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"}, 

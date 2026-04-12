@@ -1,11 +1,15 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
+	"nexpos-be/internal/delivery/http/middleware"
 	"nexpos-be/internal/models"
 	"nexpos-be/internal/usecase"
+	"os"
+	"path/filepath"
 	"strconv"
-	"nexpos-be/internal/delivery/http/middleware"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,6 +27,7 @@ func NewProductHandler(r *gin.RouterGroup, usecase *usecase.ProductUsecase) {
 		api.GET("/", middleware.AuthMiddleware(), handler.GetAll)
 		api.PUT("/:id", middleware.AuthMiddleware(), middleware.OwnerOnly(), handler.Update)
 		api.DELETE("/:id", middleware.AuthMiddleware(), middleware.OwnerOnly(), handler.Delete)
+		api.POST("/upload", middleware.AuthMiddleware(), middleware.OwnerOnly(), handler.UploadImage)
 	}
 }
 func getStoreIDFromContext(c *gin.Context) (uint, error) {
@@ -71,7 +76,7 @@ func (h *ProductHandler) GetAll(c *gin.Context) {
 	}
 
 	products, errUsecase := h.usecase.GetAllProducts(storeID)
-	if errUsecase != nil {
+	if errUsecase != nil {	
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "gagal mengambil data produk: " + errUsecase.Error()})
 		return
 	}
@@ -124,4 +129,31 @@ func (h *ProductHandler) Delete(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "produk berhasil dihapus"})
+}
+
+func (h *ProductHandler) UploadImage(c *gin.Context) {
+	file, err := c.FormFile("image")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Gambar tidak ditemukan"})
+		return
+	}
+
+	filename := fmt.Sprintf("%d_%s", time.Now().Unix(), filepath.Base(file.Filename))
+
+	os.MkdirAll("./uploads", os.ModePerm)
+
+	savePath := filepath.Join("uploads", filename)
+
+	if err := c.SaveUploadedFile(file, savePath); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "gagal menyimpan gambar: " + err.Error()})
+		return
+	}
+	
+	imageURL := "/" + savePath
+	c.JSON(http.StatusOK, gin.H{
+		"message": "gambar berhasil diupload",
+		"data": gin.H{
+			"image_url": imageURL,
+		},
+	})
 }

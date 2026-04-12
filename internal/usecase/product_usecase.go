@@ -35,6 +35,7 @@
 		product.Stock = updatedData.Stock
 		product.Category = updatedData.Category
 		product.Description = updatedData.Description
+		product.ImageURL = updatedData.ImageURL
 
 		return u.repo.Update(product)
 	}

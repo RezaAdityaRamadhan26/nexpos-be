@@ -11,6 +11,7 @@ type Product struct {
 	Stock     int       `gorm:"not null;default:0" json:"stock"`
 	Category    string    `gorm:"type:varchar(100)" json:"category"`
 	Description string    `gorm:"type:text" json:"description"`
+	ImageURL    string    `json:"image_url"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
