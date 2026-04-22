@@ -1,26 +1,29 @@
-package main
+package api
 
 import (
+	"net/http"
+	"time"
+
 	"nexpos-be/internal/config"
-	deliveryHTTP "nexpos-be/internal/delivery/http" // alias biar ga tabrakan sama package bawaan go
+	deliveryHTTP "nexpos-be/internal/delivery/http"
 	"nexpos-be/internal/delivery/http/middleware"
 	"nexpos-be/internal/repository"
 	"nexpos-be/internal/usecase"
-	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
+var app *gin.Engine
+
+func init() {
 	config.ConnectDB()
 
-	r := gin.Default()
-	r.Static("/uploads", "./uploads")
+	app = gin.Default()
 
-	r.Use(cors.New(cors.Config{
-	AllowOriginFunc: func(origin string) bool {
-			return true 
+	app.Use(cors.New(cors.Config{
+		AllowOriginFunc: func(origin string) bool {
+			return true
 		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
@@ -29,29 +32,26 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	// user
 	userRepo := repository.NewUserRepository(config.DB)
 	userUsecase := usecase.NewUserUsecase(userRepo)
-	deliveryHTTP.NewUserHandler(r, userUsecase)
+	deliveryHTTP.NewUserHandler(app, userUsecase)
 
-	// product
 	productRepo := repository.NewProductRepository(config.DB)
 	productUsecase := usecase.NewProductUsecase(productRepo)
 
-	// transaction
 	transactionRepo := repository.NewTransactionRepository(config.DB)
 	transactionUsecase := usecase.NewTransactionUsecase(transactionRepo)
-	
-	// middleware
-	protected := r.Group("/api")
+
+	protected := app.Group("/api")
 	protected.Use(middleware.AuthMiddleware())
-	// protected
 	deliveryHTTP.NewProductHandler(protected, productUsecase)
 	deliveryHTTP.NewTransactionHandler(protected, transactionUsecase)
 
-	r.GET("/api/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{"message": "pong!"})
+	app.GET("/api/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{"message": "berhasil dari vercel!"})
 	})
+}
 
-	r.Run(":8080")
+func Handler(w http.ResponseWriter, r *http.Request) {
+	app.ServeHTTP(w, r)
 }
